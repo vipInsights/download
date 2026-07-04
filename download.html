@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Test</title>
+
+<style>
+body{
+    font-family:Arial;
+    margin:40px;
+}
+
+button{
+    padding:12px 20px;
+    font-size:18px;
+    cursor:pointer;
+}
+</style>
+
+</head>
+<body>
+
+<h2>PDF Download Test</h2>
+
+<button onclick="downloadPdfInNewTab()">
+Open PDF
+</button>
+
+<script>
+
+// **************************************
+// Replace with your Base64 PDF
+// **************************************
+
+var samplePdf =
+ "JVBERi0xLjQKMSAwIG9iago8PAovVGl0bGUgKFNhbXBsZSBQREYpCi9DcmVhdG9yIChUZXN0KQov" +
+        "UHJvZHVjZXIgKFRlc3QpCi9DcmVhdGlvbkRhdGUgKEQ6MjAyNDAxMDEpCj4+CmVuZG9iagoyIDAg" +
+        "b2JqCjw8Ci9UeXBlIC9DYXRhbG9nCi9QYWdlcyAzIDAgUgo+PgplbmRvYmoKMyAwIG9iago8PAov" +
+        "VHlwZSAvUGFnZXMKL0tpZHMgWzQgMCBSXQovQ291bnQgMQo+PgplbmRvYmoKNCAwIG9iago8PAov" +
+        "VHlwZSAvUGFnZQovUGFyZW50IDMgMCBSCi9NZWRpYUJveCBbMCAwIDYxMiA3OTJdCi9Db250ZW50" +
+        "cyA1IDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA2IDAgUgo+Pgo+Pgo+PgplbmRvYmoK" +
+        "NSAwIG9iago8PAovTGVuZ3RoIDEzNQo+PgpzdHJlYW0KQlQKL0YxIDI0IFRmCjEwMCA3MDAgVGQK" +
+        "KFNhbXBsZSBQREYgRG9jdW1lbnQpIFRqCi9GMSAxNiBUZgoxMDAgNjUwIFRkCihUaGlzIGlzIGEg" +
+        "dGVzdCBQREYgZmlsZS4pIFRqCi9GMSAxMiBUZgoxMDAgNjAwIFRkCihPcGVuZWQgc3VjY2Vzc2Z1" +
+        "bGx5IG9uIHlvdXIgZGV2aWNlISkgVGoKRVQKZW5kc3RyZWFtCmVuZG9iago2IDAgb2JqCjw8Ci9U" +
+        "eXBlIC9Gb250Ci9TdWJ0eXBlIC9UeXBlMQovQmFzZUZvbnQgL0hlbHZldGljYQo+PgplbmRvYmoK" +
+        "eHJlZgowIDcKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAx" +
+        "MDAgMDAwMDAgbiAKMDAwMDAwMDE1MyAwMDAwMCBuIAowMDAwMDAwMjEwIDAwMDAwIG4gCjAwMDAw" +
+        "MDA0MTMgMDAwMDAgbiAKMDAwMDAwMDYwMCAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9TaXplIDcKL1Jv" +
+        "b3QgMiAwIFIKL0luZm8gMSAwIFIKPj4Kc3RhcnR4cmVmCjY3OAolJUVPRg==";
+
+// **************************************
+
+function downloadPdfInNewTab() {
+
+    // Must be directly inside click handler
+    var pdfTab = window.open("", "_blank");
+
+    if (!pdfTab){
+        alert("Popup blocked.");
+        return;
+    }
+
+    try{
+
+        var pdfData = samplePdf;
+
+        pdfData = pdfData.replace(/^data:application\/pdf;base64,/, "");
+
+        var blob = base64ToBlob(pdfData,"application/pdf");
+
+        console.log(blob);
+
+        console.log(blob.size);
+
+        var blobUrl = URL.createObjectURL(blob);
+
+        console.log(blobUrl);
+
+        pdfTab.location.href = blobUrl;
+
+        setTimeout(function(){
+
+            URL.revokeObjectURL(blobUrl);
+
+        },60000);
+
+    }
+    catch(e){
+
+        console.error(e);
+
+        try{
+            pdfTab.close();
+        }
+        catch(ignore){}
+
+        alert(e);
+
+    }
+
+}
+
+function base64ToBlob(base64,contentType){
+
+    contentType = contentType || "";
+
+    var sliceSize = 512;
+
+    var byteCharacters = atob(base64);
+
+    var byteArrays = [];
+
+    for(var offset=0;offset<byteCharacters.length;offset+=sliceSize){
+
+        var slice = byteCharacters.slice(offset,offset+sliceSize);
+
+        var byteNumbers = new Array(slice.length);
+
+        for(var i=0;i<slice.length;i++){
+
+            byteNumbers[i]=slice.charCodeAt(i);
+
+        }
+
+        byteArrays.push(new Uint8Array(byteNumbers));
+
+    }
+
+    return new Blob(byteArrays,{
+        type:contentType
+    });
+
+}
+
+</script>
+
+</body>
+</html>
